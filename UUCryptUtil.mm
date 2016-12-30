@@ -81,11 +81,14 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
 @implementation UUCryptUtil
 
 + (NSError*)crypt:(NSString*)srcPath to:(NSString*)destPath key:(NSString*)key block:(NSData*(^)(NSData*))block{
+    
     NSAssert(srcPath && destPath, @"Source path or dest path nil.");
     
-    NSFileHandle *fileRead = [NSFileHandle fileHandleForReadingAtPath:srcPath];
+    NSError *error;
+    
+    NSFileHandle *fileRead = [NSFileHandle fileHandleForReadingFromURL:[NSURL fileURLWithPath:srcPath] error:&error];
     if (!fileRead) {
-        return [NSError errorWithDomain:@"Source file invalid." code:-1 userInfo:@{}];
+        return error;
     }
     
     NSFileHandle *fileWrite = [NSFileHandle fileHandleForWritingAtPath:destPath];
