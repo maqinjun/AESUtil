@@ -8,10 +8,34 @@
 
 #import <Foundation/Foundation.h>
 #import "UUCryptUtil.h"
+#import "uuaes.h"
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
-        // insert code here...
+        
+        NSString *src1 = @"/Users/maqj/tmp/encrypt.pdf";
+        NSString *dest1 = @"/Users/maqj/tmp/encrypt1.pdf";
+        NSString *dest2 = @"/Users/maqj/tmp/encrypt2.pdf";
+        NSString *key1 = @"ec2f151588db9e20";
+        
+        NSError *error1 = nil;
+        
+        error1 = [[UUCryptUtil shared] decrypt:src1 to:dest1 key:key1];
+
+        if (error1) {
+            printf("%s\n", [error1.description cStringUsingEncoding:NSUTF8StringEncoding]);
+            return 0;
+        }
+
+        error1 = [[UUCryptUtil shared] decrypt:src1 to:dest2 key:key1];
+        
+        if (error1) {
+            printf("%s\n", [error1.description cStringUsingEncoding:NSUTF8StringEncoding]);
+            return 0;
+        }
+
+        
+        return 0;
         
         if (argc<5) {
             printf("Usage: CryptTest [--encrypt | --decrypt] source_file  target_file key (16 char)\n");
@@ -47,10 +71,10 @@ int main(int argc, const char * argv[]) {
         NSError *error = nil;
         
         if ([operation isEqualToString:@"--encrypt"]) {
-            error = [UUCryptUtil encrypt:src to:dest key:[NSString stringWithFormat:@"%s", key]];
+            error = [[UUCryptUtil shared] encrypt:src to:dest key:[NSString stringWithFormat:@"%s", key]];
 
         }else if ([operation isEqualToString:@"--decrypt"]){
-            error = [UUCryptUtil decrypt:src to:dest key:[NSString stringWithFormat:@"%s", key]];
+            error = [[UUCryptUtil shared] decrypt:src to:dest key:[NSString stringWithFormat:@"%s", key]];
         }else{
             printf("Usage: CryptTest [--encrypt | --decrypt] source_file  target_file key (16 char)\n");
             return 0;

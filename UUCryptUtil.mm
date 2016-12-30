@@ -7,21 +7,25 @@
 //
 
 #import "UUCryptUtil.h"
-
+#import <CommonCrypto/CommonCrypto.h>
 #include "uuaes.h"
 
-#import <CommonCrypto/CommonCryptor.h>
+@implementation UUCryptUtil{
+    unsigned char _iv[16];
+}
 
-unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
++ (instancetype)shared{
+    static UUCryptUtil *util = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        util = [[UUCryptUtil alloc] init];
+    });
+    return util;
+}
 
-@interface NSData (NSData_AES)
-
-@end
-
-@implementation NSData (NSData_AES)
-
-- (NSData *)AES128EncryptWithKey:(NSString *)key//加密
+- (NSData *)AES128EncryptWithKey:(NSString *)key iv:(unsigned char[16]) iv data:(NSData*)data//加密
 {
+    
     unsigned char * keyTmp = (unsigned char*)malloc(sizeof(unsigned char) *kCCKeySizeAES128);
     const char *keyChar = [key cStringUsingEncoding:NSUTF8StringEncoding];
     memcpy(keyTmp, keyChar, sizeof(unsigned char) *kCCKeySizeAES128);
@@ -31,7 +35,7 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
     
     aes_setkey_enc(&aes, (unsigned char*)keyTmp, keysize);
     
-    NSUInteger dataLength = [self length];
+    NSUInteger dataLength = [data length];
     size_t bufferSize = dataLength + kCCBlockSizeAES128;
     unsigned char* buffer = (unsigned char*)malloc(sizeof(unsigned char)*bufferSize);
     memset(buffer, 0, bufferSize);
@@ -39,12 +43,15 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
     size_t inBufferSize = dataLength + (dataLength%16?(16-dataLength%16):0);
     unsigned char* inBuffer = (unsigned char*)malloc(sizeof(unsigned char)*inBufferSize);
     memset(inBuffer, 0, inBufferSize);
-    memcpy(inBuffer, [self bytes], dataLength);
+    memcpy(inBuffer, [data bytes], dataLength);
     
     
     int ret = aes_crypt_cbc(&aes, AES_ENCRYPT, inBufferSize, iv, inBuffer, buffer);
     
+    memset(&aes, 0, sizeof(aes));
+    
     free(keyTmp);
+    free(inBuffer);
     
     if (ret < 0) {
         free(buffer);
@@ -55,7 +62,7 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
 }
 
 
-- (NSData *)AES128DecryptWithKey:(NSString *)key//解密
+- (NSData *)AES128DecryptWithKey:(NSString *)key  iv:(unsigned char[16]) iv data:(NSData*)data//解密
 {
     unsigned char * keyTmp = (unsigned char*)malloc(sizeof(unsigned char) *kCCKeySizeAES128);
     const char *keyChar = [key cStringUsingEncoding:NSUTF8StringEncoding];
@@ -63,15 +70,14 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
     
     int keysize = 128;
     aes_context aes;
-    
     aes_setkey_dec(&aes, (unsigned char*)keyTmp, keysize);
     
-    NSUInteger dataLength = [self length];
+    NSUInteger dataLength = [data length];
     size_t bufferSize = dataLength + kCCBlockSizeAES128;
     unsigned char* buffer = (unsigned char*)malloc(sizeof(unsigned char)*bufferSize);
     memset(buffer, 0, bufferSize);
-
-    int ret = aes_crypt_cbc(&aes, AES_DECRYPT, dataLength, iv, (unsigned char*)[self bytes], buffer);
+    
+    int ret = aes_crypt_cbc(&aes, AES_DECRYPT, dataLength, iv, (unsigned char*)[data bytes], buffer);
     
     free(keyTmp);
     
@@ -82,11 +88,9 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
     
     return [NSData dataWithBytesNoCopy:buffer length:dataLength];
 }
-@end
 
-@implementation UUCryptUtil
 
-+ (NSError*)crypt:(NSString*)srcPath to:(NSString*)destPath key:(NSString*)key block:(NSData*(^)(NSData*))block{
+- (NSError*)crypt:(NSString*)srcPath to:(NSString*)destPath key:(NSString*)key block:(NSData*(^)(NSData*))block{
     
     NSAssert(srcPath && destPath, @"Source path or dest path nil.");
     
@@ -97,7 +101,7 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
         return error;
     }
     
-    NSFileHandle *fileWrite = [NSFileHandle fileHandleForWritingAtPath:destPath];
+    NSFileHandle *fileWrite = [NSFileHandle fileHandleForWritingToURL:[NSURL fileURLWithPath:destPath] error:&error];
     if (!fileWrite) {
         [[NSFileManager defaultManager] createFileAtPath:destPath contents:nil attributes:nil];
         fileWrite = [NSFileHandle fileHandleForWritingAtPath:destPath];
@@ -110,6 +114,10 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
     }
     
     @try {
+        
+        [fileRead seekToFileOffset:0];
+        [fileWrite seekToFileOffset:0];
+        
         NSData *data = [fileRead readDataOfLength:1024];
         
         while (data.length>0) {
@@ -145,18 +153,26 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
         }
     }
     
+    return nil;
 }
 
-+ (NSError*)encrypt:(NSString*)srcPath to:(NSString*)destPath key:(NSString*)key{
+- (NSError*)encrypt:(NSString*)srcPath to:(NSString*)destPath key:(NSString*)key{
+    
+    unsigned char ivTemp[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
+    memcpy(_iv, ivTemp, sizeof(_iv));
+
     return  [self crypt:srcPath to:destPath key:key block:^NSData *(NSData *data) {
-        return [data AES128EncryptWithKey:key];
+        return [self AES128EncryptWithKey:key iv:_iv data:data];
     }];
 }
 
-+ (NSError*)decrypt:(NSString*)srcPath to:(NSString*)destPath key:(NSString*)key{
+- (NSError*)decrypt:(NSString*)srcPath to:(NSString*)destPath key:(NSString*)key{
+    
+    unsigned char ivTemp[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
+    memcpy(_iv, ivTemp, sizeof(_iv));
 
     return  [self crypt:srcPath to:destPath key:key block:^NSData *(NSData *data) {
-        return [data AES128DecryptWithKey:key];
+        return [self AES128DecryptWithKey:key iv:_iv data:data];
     }];
 }
 @end
