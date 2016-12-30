@@ -8,7 +8,7 @@
 
 #import "UUCryptUtil.h"
 #import <CommonCrypto/CommonCrypto.h>
-#include "uuaes.h"
+#include "aes.h"
 
 @implementation UUCryptUtil{
     unsigned char _iv[16];

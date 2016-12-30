@@ -8,34 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "UUCryptUtil.h"
-#import "uuaes.h"
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
-        
-        NSString *src1 = @"/Users/maqj/tmp/encrypt.pdf";
-        NSString *dest1 = @"/Users/maqj/tmp/encrypt1.pdf";
-        NSString *dest2 = @"/Users/maqj/tmp/encrypt2.pdf";
-        NSString *key1 = @"ec2f151588db9e20";
-        
-        NSError *error1 = nil;
-        
-        error1 = [[UUCryptUtil shared] decrypt:src1 to:dest1 key:key1];
-
-        if (error1) {
-            printf("%s\n", [error1.description cStringUsingEncoding:NSUTF8StringEncoding]);
-            return 0;
-        }
-
-        error1 = [[UUCryptUtil shared] decrypt:src1 to:dest2 key:key1];
-        
-        if (error1) {
-            printf("%s\n", [error1.description cStringUsingEncoding:NSUTF8StringEncoding]);
-            return 0;
-        }
-
-        
-        return 0;
         
         if (argc<5) {
             printf("Usage: CryptTest [--encrypt | --decrypt] source_file  target_file key (16 char)\n");
