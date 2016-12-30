@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "UUCryptUtil.h"
-
+// key like c646f3311d00fbd9
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
         // insert code here...
