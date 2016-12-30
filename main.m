@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "UUCryptUtil.h"
-// key like c646f3311d00fbd9
+
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
         // insert code here...
@@ -28,7 +28,7 @@ int main(int argc, const char * argv[]) {
         NSString *dest = nil;
         
         NSString *curPath = [NSString stringWithFormat:@"%s", path];
-        curPath = [curPath stringByReplacingOccurrencesOfString:[curPath lastPathComponent] withString:@""];
+        curPath = [curPath stringByReplacingOccurrencesOfString:[curPath lastPathComponent] withString:@"./"];
 
         src = [NSString stringWithFormat:@"%s", sourceFile];
         dest = [NSString stringWithFormat:@"%s", destFile];
@@ -40,8 +40,8 @@ int main(int argc, const char * argv[]) {
             dest = [NSString stringWithFormat:@"%@/%s", curPath, destFile];
         }
         
-        printf("%s\n", sourceFile);
-        printf("%s\n", destFile);
+        NSLog(@"%@", src);
+        NSLog(@"%@", dest);
         
         NSString *operation = [NSString stringWithFormat:@"%s", opt];
         NSError *error = nil;

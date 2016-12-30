@@ -36,7 +36,13 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
     unsigned char* buffer = (unsigned char*)malloc(sizeof(unsigned char)*bufferSize);
     memset(buffer, 0, bufferSize);
     
-    int ret = aes_crypt_cbc(&aes, AES_ENCRYPT, dataLength, iv, (unsigned char*)[self bytes], buffer);
+    size_t inBufferSize = dataLength + (dataLength%16?(16-dataLength%16):0);
+    unsigned char* inBuffer = (unsigned char*)malloc(sizeof(unsigned char)*inBufferSize);
+    memset(inBuffer, 0, inBufferSize);
+    memcpy(inBuffer, [self bytes], dataLength);
+    
+    
+    int ret = aes_crypt_cbc(&aes, AES_ENCRYPT, inBufferSize, iv, inBuffer, buffer);
     
     free(keyTmp);
     
@@ -45,7 +51,7 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
         return nil;
     }
     
-    return [NSData dataWithBytesNoCopy:buffer length:dataLength];
+    return [NSData dataWithBytesNoCopy:buffer length:inBufferSize];
 }
 
 
@@ -117,7 +123,7 @@ unsigned char iv[16] = { 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8};
 
             if ( !decryptedData||status!= kCCSuccess) {
                 NSLog(@"Failed.");
-                return [NSError errorWithDomain:@"Decrypt failed." code:status userInfo:nil];
+                return [NSError errorWithDomain:@"crypt failed." code:status userInfo:nil];
             }
             
             [fileWrite writeData:decryptedData];
