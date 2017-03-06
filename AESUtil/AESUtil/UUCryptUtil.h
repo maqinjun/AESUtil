@@ -1,6 +1,6 @@
 //
 //  UUCryptUtil.h
-//  UUEMMDemo
+//  CryptTest
 //
 //  Created by maqj on 16/12/29.
 //  Copyright © 2016年 maqj. All rights reserved.
