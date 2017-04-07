@@ -10,6 +10,7 @@
 		C83D56791E1631F400BCA446 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C83D56781E1631F400BCA446 /* main.m */; };
 		C83D56831E16324F00BCA446 /* aes.c in Sources */ = {isa = PBXBuildFile; fileRef = C83D567F1E16324F00BCA446 /* aes.c */; };
 		C83D56841E16324F00BCA446 /* UUCryptUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = C83D56821E16324F00BCA446 /* UUCryptUtil.mm */; };
+		C8FC04861E972AF800E9FAE4 /* NSData+cipher.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FC04851E972AF800E9FAE4 /* NSData+cipher.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +32,8 @@
 		C83D56801E16324F00BCA446 /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aes.h; sourceTree = "<group>"; };
 		C83D56811E16324F00BCA446 /* UUCryptUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UUCryptUtil.h; sourceTree = "<group>"; };
 		C83D56821E16324F00BCA446 /* UUCryptUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = UUCryptUtil.mm; sourceTree = "<group>"; };
+		C8FC04841E972AF800E9FAE4 /* NSData+cipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+cipher.h"; sourceTree = "<group>"; };
+		C8FC04851E972AF800E9FAE4 /* NSData+cipher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+cipher.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +71,8 @@
 				C83D56811E16324F00BCA446 /* UUCryptUtil.h */,
 				C83D56821E16324F00BCA446 /* UUCryptUtil.mm */,
 				C83D56781E1631F400BCA446 /* main.m */,
+				C8FC04841E972AF800E9FAE4 /* NSData+cipher.h */,
+				C8FC04851E972AF800E9FAE4 /* NSData+cipher.m */,
 			);
 			path = AESUtil;
 			sourceTree = "<group>";
@@ -133,6 +138,7 @@
 				C83D56791E1631F400BCA446 /* main.m in Sources */,
 				C83D56841E16324F00BCA446 /* UUCryptUtil.mm in Sources */,
 				C83D56831E16324F00BCA446 /* aes.c in Sources */,
+				C8FC04861E972AF800E9FAE4 /* NSData+cipher.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -261,6 +267,7 @@
 				C83D567E1E1631F400BCA446 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

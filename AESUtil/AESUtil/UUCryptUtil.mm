@@ -8,7 +8,25 @@
 
 #import "UUCryptUtil.h"
 #import <CommonCrypto/CommonCrypto.h>
+#import <CommonCrypto/CommonDigest.h>
 #include "aes.h"
+
+NSString *defaultKey(){
+    NSString *keySeed = @"5aSn6ICB5p2/U0IK";
+    const char *key_seed = [keySeed UTF8String];
+    unsigned char buf[CC_MD5_DIGEST_LENGTH];
+    
+    unsigned char *(*md5fun)(const char*, CC_LONG, unsigned char *);
+    md5fun = (unsigned char *(*)(const char*, CC_LONG, unsigned char *))CC_MD5;
+    md5fun(key_seed, (CC_LONG)strlen(key_seed), buf);
+    NSMutableString *mutStr = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
+    for(int i = 0; i < CC_MD5_DIGEST_LENGTH; i++){
+        [mutStr appendFormat:@"%02x", buf[i]];
+    }
+    
+    return [mutStr substringToIndex:CC_MD5_DIGEST_LENGTH];
+}
+
 
 @implementation UUCryptUtil{
     unsigned char _iv[16];
